@@ -1,9 +1,7 @@
 import com.google.common.collect.Lists;
-import com.google.j2objc.annotations.ObjectiveCName;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.lib.*;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
@@ -17,6 +15,7 @@ import java.util.List;
 /**
  * Created by Carol on 2018/11/27.
  */
+
 public class GitOperator {
     private String gitProject;
     private Repository repository;
@@ -81,9 +80,9 @@ public class GitOperator {
                 FileObject fileObject = new FileObject(path, filename, objectid);
                 ObjectLoader loader = repository.open(objectid);
                 fileObject.setLoader(loader);
+                fileObject.setFiledata(new String(loader.getBytes(), "UTF-8"));
                 if(!typeFilter.isFilter(fileObject.getType()))
                     result.add(fileObject);
-
             }
             return result;
         }catch (IOException e) {

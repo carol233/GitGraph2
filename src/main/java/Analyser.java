@@ -32,14 +32,7 @@ public class Analyser {
                 for(FileObject fileObject : files) {
                     System.out.println(fileObject.getPath());
                     System.out.println(fileObject.getName());
-                    //PathFilter.create();
-                    //System.out.println(gitOperator.getFilename(id));
-//                    ObjectLoader loader = gitOperator.getFileLoader(id);
-//                    try {
-//                        System.out.println(new String(loader.getBytes(), "UTF-8"));
-//                    } catch (UnsupportedEncodingException e) {
-//                        e.printStackTrace();
-//                    }
+                    System.out.println(fileObject.getFiledata());
                 }
             }
         }

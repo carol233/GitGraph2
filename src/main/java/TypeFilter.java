@@ -6,7 +6,8 @@ public class TypeFilter{
     private static String[] PICS = {"bmp", "jpg", "jpeg", "png", "gif", "tga", "tif", "emf", "pic", "ico"};
     private static String[] VIDEOS = {"avi", "mpg", "mov", "mp4", "swf"};
     private static String[] AUDIOS = {"mp3", "wav", "aif", "au", "ram", "wma", "mmf", "amr", "aac", "flac"};
-    private static String[] CUSTOM = {"xml", "yml", "js", "cpp", "c", "mk", "py", "html", "h", "gradle", "jar", "md", "gitignore"};
+    private static String[] CUSTOM = {"xml", "yml", "js", "cpp", "c", "mk", "py", "html", "h", "gradle", "jar",
+            "md", "gitignore", "properties"};
 
     private boolean filter_pic = false;
     private boolean filter_audio = false;
@@ -14,7 +15,6 @@ public class TypeFilter{
     private boolean filter_custom = false;
 
     public TypeFilter(){
-
     }
 
     public void setPicFilter(boolean a){

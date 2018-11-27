@@ -10,6 +10,7 @@ public class FileObject {
     private String name = null;
     private ObjectLoader loader = null;
     private ObjectId id = null;
+    private String filedata = null;
 
     public String getPath() {
         return path;
@@ -21,6 +22,10 @@ public class FileObject {
 
     public String getName() {
         return name;
+    }
+
+    public String getFiledata() {
+        return filedata;
     }
 
     public ObjectLoader getLoader() {
@@ -42,8 +47,11 @@ public class FileObject {
             this.type = null;
         }
     }
-
     public void setLoader(ObjectLoader loader){
         this.loader = loader;
+    }
+
+    public void setFiledata(String filedata) {
+        this.filedata = filedata;
     }
 }
