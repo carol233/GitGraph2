@@ -46,7 +46,7 @@ public class GitOperator {
 
     public List<Ref> getBranches() {
         try {
-            return git.branchList().setListMode( ListBranchCommand.ListMode.ALL ).call();
+            return git.branchList().call();
         } catch (GitAPIException e) {
             e.printStackTrace();
         }
