@@ -30,7 +30,7 @@ public class MethodObject {
     public void setBody(String body) {
         this.body = body;
         this.body_md5 = Utils.md5(body);
-        List<String> calls = Utils.extractCalls(body);
+//        List<String> calls = Utils.extractCalls(body);
     }
 
     public String getName() {

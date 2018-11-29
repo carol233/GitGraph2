@@ -133,16 +133,20 @@ public class Neo4jFuncs {
 
     public void createRelationship(Node node1, Node node2, GitRelationships rel) {
         try (Transaction tx = db.beginTx()) {
-            Iterable<Relationship> rels = node1.getRelationships();
-            Boolean flag = true;
-            for(Relationship relationship : rels){
-                if (relationship.getOtherNode(node1).equals(node2)) {
-                    flag = false;
-                    break;
+            if(rel == GitRelationships.MethodtoAPI){
+                Iterable<Relationship> rels = node1.getRelationships();
+                Boolean flag = true;
+                for(Relationship relationship : rels){
+                    if (relationship.getOtherNode(node1).equals(node2)) {
+                        flag = false;
+                        break;
+                    }
                 }
-            }
-            if(flag)
+                if(flag)
+                    node1.createRelationshipTo(node2, rel);
+            }else{
                 node1.createRelationshipTo(node2, rel);
+            }
 
             tx.success();
         }

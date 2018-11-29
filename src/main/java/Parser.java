@@ -63,7 +63,7 @@ public class Parser {
                 for (String call : calls) {
                     if (apiDatabase != null) {
                         ApiObject api = apiDatabase.isApi(imports, call);
-                        if (api != null) {
+                        if (api != null && !apis.contains(api)) {
                             apis.add(api);
                         }
                     }
