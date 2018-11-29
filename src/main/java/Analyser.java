@@ -1,12 +1,16 @@
+import api.APIDatabase;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.ObjectLoader;
+import git.GitOperator;
+import model.ApiObject;
+import model.ClassObject;
+import model.FileObject;
+import model.MethodObject;
+import neo4j.GitRelationships;
+import neo4j.Neo4jFuncs;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.neo4j.graphdb.Node;
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 /**
@@ -58,9 +62,9 @@ public class Analyser {
                     neo4j.createRelationship(now_commit, file_node, GitRelationships.CommittoFile);
                     if (fileObject.getType().equals("java")) {
                         Parser parser = new Parser(fileObject.getPath(), fileObject.getFiledata());
-                        //System.out.println(fileObject.getPath());
+                        System.out.println(fileObject.getPath());
                         for (ClassOrInterfaceDeclaration clazz : parser.getClasses()){
-                            ClassObject co = parser.getClass(clazz, apiDatabase);
+                            ClassObject co = parser.resolveClass(clazz, apiDatabase);
                             class_node = neo4j.matchClassMD5(co);
                             if(class_node == null){
                                 class_node = neo4j.createClassNode(co);

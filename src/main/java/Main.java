@@ -1,19 +1,33 @@
+import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.ArgumentParserException;
+import net.sourceforge.argparse4j.inf.Namespace;
+
 /**
  * Created by Carol on 2018/11/27.
  */
 
 public class Main {
-    public static void main(String[] argv){
-        String project = "";
-        String filter = "";
-        for (int i = 0; i < argv.length; i++){
-            if(argv[i].equals("-p")){
-                project = argv[i+1];
-            }
-            else if(argv[i].equals("-f")){
-                filter = argv[i+1];
-            }
+    public static void main(String[] args){
+        ArgumentParser parser = ArgumentParsers.newFor("Main").build()
+                .defaultHelp(true)
+                .description("Analyse a git project and build visible graph");
+
+        parser.addArgument("-p", "--project")
+                .help("git project root directory");
+        parser.addArgument("-f", "--filter")
+                .help("type filter switch for source file");
+
+        Namespace ns = null;
+        try {
+            ns = parser.parseArgs(args);
+        } catch (ArgumentParserException e) {
+            parser.handleError(e);
+            System.exit(1);
         }
+
+        String project = ns.getString("project");
+        String filter = ns.getString("filter");
         new Analyser(project, filter).run();
     }
 }
