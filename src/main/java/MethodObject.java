@@ -1,3 +1,5 @@
+import java.util.List;
+
 public class MethodObject {
     private String name = null;
     private String body_md5 = null;
@@ -5,17 +7,9 @@ public class MethodObject {
     private String clazz = null;
     private String body = null;
     private String sign_md5 = null;
+    private List<ApiObject> apis = null;
 
     public MethodObject() {
-    }
-
-    public MethodObject(String name, String body_md5, String file, String clazz, String body, String sign_md5) {
-        this.name = name;
-        this.body_md5 = body_md5;
-        this.file = file;
-        this.clazz = clazz;
-        this.body = body;
-        this.sign_md5 = sign_md5;
     }
 
     public void setName(String name) {
@@ -33,6 +27,7 @@ public class MethodObject {
     public void setBody(String body) {
         this.body = body;
         this.body_md5 = Utils.md5(body);
+        List<String> calls = Utils.extractCalls(body);
     }
 
     public String getName() {
@@ -49,6 +44,14 @@ public class MethodObject {
 
     public String getClazz() {
         return clazz;
+    }
+
+    public List<ApiObject> getApis() {
+        return apis;
+    }
+
+    public void setApis(List<ApiObject> apis) {
+        this.apis = apis;
     }
 
     public String getBody() {

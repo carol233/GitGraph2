@@ -3,11 +3,13 @@
  */
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import com.sun.jnlp.ApiDialog;
 import jdk.nashorn.internal.runtime.ParserException;
 import org.apache.commons.lang3.StringUtils;
 
@@ -35,9 +37,19 @@ public class Parser {
         }
     }
 
-    public ClassObject getClass(ClassOrInterfaceDeclaration clazz){
+    public ClassObject getClass(ClassOrInterfaceDeclaration clazz, APIDatabase apiDatabase){
         List<MethodObject> methods = new ArrayList<>();
         NodeList<BodyDeclaration<?>> member = clazz.getMembers();
+        NodeList<ImportDeclaration> importDeclarations;
+        List<String> imports = new ArrayList<>();
+        if(clazz.getParentNode().get() instanceof CompilationUnit) {
+            importDeclarations = ((CompilationUnit) clazz.getParentNode().get()).getImports();
+
+            for (int i = 0; i < importDeclarations.size(); i++) {
+                imports.add(importDeclarations.get(i).getName().toString());
+            }
+        }
+
         ClassObject co = new ClassObject();
         for (int i=0; i<member.size(); i++){
             if (member.get(i) instanceof MethodDeclaration){
@@ -47,6 +59,19 @@ public class Parser {
                 mo.setFile(this.filepath);
                 mo.setBody(m.toString());
                 mo.setClazz(clazz.getNameAsString());
+
+                List<String> calls = Utils.extractCalls(mo.getBody());
+                List<ApiObject> apis = new ArrayList<>();
+                for (String call : calls){
+                    if (apiDatabase != null) {
+                        ApiObject api = apiDatabase.isApi(imports, call);
+                        if (api != null) {
+                            apis.add(api);
+                        }
+                    }
+                }
+                mo.setApis(apis);
+//                System.out.println(apis);
                 methods.add(mo);
             }
         }

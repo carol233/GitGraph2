@@ -26,7 +26,11 @@ public class Analyser {
     }
 
     public void run(){
-        Node branch_node, last_commit = null, now_commit, file_node, class_node, method_node;
+        APIDatabase apiDatabase = new APIDatabase();
+        apiDatabase.load_api("assets/current.txt");
+        apiDatabase.load_api("assets/system-current.txt");
+
+        Node branch_node, last_commit = null, api_node, now_commit, file_node, class_node, method_node;
 
         branches = gitOperator.getBranches();
         for(Ref branch : branches){
@@ -54,11 +58,10 @@ public class Analyser {
                     neo4j.createRelationship(now_commit, file_node, GitRelationships.CommittoFile);
                     if (fileObject.getType().equals("java")) {
                         Parser parser = new Parser(fileObject.getPath(), fileObject.getFiledata());
-                        System.out.println(fileObject.getPath());
+                        //System.out.println(fileObject.getPath());
                         for (ClassOrInterfaceDeclaration clazz : parser.getClasses()){
-                            ClassObject co = parser.getClass(clazz);
+                            ClassObject co = parser.getClass(clazz, apiDatabase);
                             class_node = neo4j.matchClassMD5(co);
-                            System.out.println(class_node);
                             if(class_node == null){
                                 class_node = neo4j.createClassNode(co);
                             }
@@ -69,6 +72,13 @@ public class Analyser {
                                     method_node = neo4j.createMethodNode(mo);
                                 }
                                 neo4j.createRelationship(class_node, method_node, GitRelationships.ClasstoMethod);
+                                for(ApiObject ao : mo.getApis()){
+                                    api_node = neo4j.matchAPI(ao);
+                                    if(api_node == null){
+                                        api_node = neo4j.createAPINode(ao);
+                                    }
+                                    neo4j.createRelationship(method_node, api_node, GitRelationships.MethodtoAPI);
+                                }
                             }
                         }
                     }

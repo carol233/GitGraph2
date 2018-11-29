@@ -17,7 +17,7 @@ public class Neo4jFuncs {
         GraphDatabaseFactory dbFactory = new GraphDatabaseFactory();
         File database = new File("./graph.db");
         if (database.exists())
-            database.delete();
+            Utils.deleteDir(database);
         this.db = dbFactory.newEmbeddedDatabase(new File("./graph.db"));
     }
 
@@ -112,10 +112,31 @@ public class Neo4jFuncs {
         return node;
     }
 
-    public void createRelationship(Node node1, Node node2, GitRelationships rel) {
+    public Node createAPINode(ApiObject ao) {
+        Node node;
         try (Transaction tx = db.beginTx()) {
 
-            Relationship relationship = node1.createRelationshipTo(node2, rel);
+            // 创建节点
+            node = db.createNode(GitLables.API);
+            node.setProperty("name", ao.getSign());
+
+            tx.success();
+        }
+        return node;
+    }
+
+    public void createRelationship(Node node1, Node node2, GitRelationships rel) {
+        try (Transaction tx = db.beginTx()) {
+            Iterable<Relationship> rels = node1.getRelationships();
+            Boolean flag = true;
+            for(Relationship relationship : rels){
+                if (relationship.getOtherNode(node1).equals(node2)) {
+                    flag = false;
+                    break;
+                }
+            }
+            if(flag)
+                node1.createRelationshipTo(node2, rel);
 
             tx.success();
         }
@@ -160,9 +181,18 @@ public class Neo4jFuncs {
         return node;
     }
 
+    public Node matchAPI(ApiObject ao){
+        Node result;
+        try (Transaction tx = db.beginTx()) {
+            result = db.findNode(GitLables.API, "name", ao.getSign());
+            tx.success();
+        }
+        return result;
+    }
+
 }
 
 enum GitLables implements Label {
-    Branch, Commit, File, Class, Method
+    Branch, Commit, File, Class, Method, API
 }
 
