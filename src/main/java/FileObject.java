@@ -10,6 +10,7 @@ public class FileObject {
     private String name = null;
     private ObjectLoader loader = null;
     private ObjectId id = null;
+    private String md5 = null;
     private String filedata = null;
 
     public String getPath() {
@@ -53,5 +54,10 @@ public class FileObject {
 
     public void setFiledata(String filedata) {
         this.filedata = filedata;
+        this.md5 = Utils.md5(filedata);
+    }
+
+    public String getMd5() {
+        return md5;
     }
 }

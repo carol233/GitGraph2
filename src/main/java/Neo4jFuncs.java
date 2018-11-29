@@ -1,76 +1,168 @@
 /**
  * Created by Carol on 2018/11/28.
  */
-import org.neo4j.driver.v1.AuthTokens;
-import org.neo4j.driver.v1.Driver;
-import org.neo4j.driver.v1.GraphDatabase;
-import org.neo4j.driver.v1.Transaction;
-import static org.neo4j.driver.v1.Values.parameters;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
+
+import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
-import org.neo4j.graphdb.factory.GraphDatabaseSettings;
+import org.w3c.dom.traversal.NodeIterator;
 
 import java.io.File;
 
 public class Neo4jFuncs {
 
-        private final Driver driver;
-
-        public Neo4jFuncs( String uri, String user, String password )
-        {
-            driver = GraphDatabase.driver( uri, AuthTokens.basic( user, password ) );
-        }
-
-        public void close() throws Exception
-        {
-            driver.close();
-        }
-
-        public void createNode() {
-            try (Transaction tx = db.beginTx()) {
-
-                // 创建节点
-                Node User1 = db.createNode(Tutorials.User);
-                User1.setProperty("name", "梁川川1");
-                User1.setProperty("sex", "男");
-                User1.setProperty("age", "25");
-
-                // 创建节点
-                Node User2 = db.createNode(Tutorials.User);
-                User2.setProperty("name", "谢静静1");
-                User2.setProperty("sex", "女");
-                User2.setProperty("age", "25");
-
-                // 梁川川 喜欢 谢静静  的关系
-                Relationship relationship = User1.createRelationshipTo(User2,TutorialRelationships.LOVE);
-                // 设置关系属性  梁川川 喜欢谢静静 多久了   开始时间
-                relationship.setProperty("time","1年");
-                relationship.setProperty("startTime","2017-06-01");
+    public GraphDatabaseService db;
 
 
-                // 创建节点
-                Node Phone = db.createNode(Tutorials.Phone);
-                User1.setProperty("brand", "魅族");
-                User1.setProperty("money", "1000");
-                User1.setProperty("time", "2017-06-01");
+    public Neo4jFuncs() {
+        GraphDatabaseFactory dbFactory = new GraphDatabaseFactory();
+        File database = new File("./graph.db");
+        if (database.exists())
+            database.delete();
+        this.db = dbFactory.newEmbeddedDatabase(new File("./graph.db"));
+    }
 
-
-
-                // 谢静静 有一部魅族手机  的关系
-                Relationship phoneRelationship = User2.createRelationshipTo(Phone,TutorialRelationships.HIVE);
-                // 设置关系属性
-                phoneRelationship.setProperty("time","1年");
-                phoneRelationship.setProperty("startTime","2017-06-01");
-
-
-                tx.success();
+    private static void registerShutdownHook(final GraphDatabaseService graphDb) {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                graphDb.shutdown();
             }
-            // 关闭非常重要
-            db.shutdown();
-            System.out.println("Done successfully");
+        });
+    }
+
+    public Node createBranchNode(String branch_name) {
+        Node node;
+        try (Transaction tx = db.beginTx()) {
+
+            // 创建节点
+            node = db.createNode(GitLables.Branch);
+            node.setProperty("name", branch_name);
+
+            tx.success();
+        }
+        return node;
+    }
+
+    public Node createCommitNode(String commit_name, String developer,
+                                 int time, String commit_message) {
+        Node node;
+        try (Transaction tx = db.beginTx()) {
+
+            // 创建节点
+            node = db.createNode(GitLables.Commit);
+            node.setProperty("name", commit_name);
+            node.setProperty("developer", developer);
+            node.setProperty("time", time);
+            node.setProperty("message", commit_message);
+
+            tx.success();
+        }
+        return node;
+    }
+
+    public Node createFileNode(FileObject f, String commit_name) {
+        Node node;
+        try (Transaction tx = db.beginTx()) {
+
+            // 创建节点
+            node = db.createNode(GitLables.File);
+            node.setProperty("name", f.getName());
+            node.setProperty("path", f.getPath());
+            node.setProperty("content", f.getFiledata());
+            node.setProperty("content_md5", f.getMd5());
+            node.setProperty("type", f.getType());
+            node.setProperty("create_commit", commit_name);
+
+            tx.success();
+        }
+        return node;
+    }
+
+    public Node createClassNode(ClassObject co) {
+        Node node;
+        try (Transaction tx = db.beginTx()) {
+
+            // 创建节点
+            node = db.createNode(GitLables.Class);
+            node.setProperty("name", co.getName());
+            node.setProperty("file", co.getFile());
+            node.setProperty("content_md5", co.getBodyMd5());
+            node.setProperty("path_signature", co.getSignMd5());
+
+            tx.success();
+        }
+        return node;
+    }
+
+    public Node createMethodNode(MethodObject mo) {
+        Node node;
+        try (Transaction tx = db.beginTx()) {
+
+            // 创建节点
+            node = db.createNode(GitLables.Method);
+            node.setProperty("name", mo.getName());
+            node.setProperty("body", mo.getBody());
+            node.setProperty("content_md5", mo.getBodyMd5());
+            node.setProperty("class", mo.getClazz());
+            node.setProperty("file", mo.getFile());
+            node.setProperty("path_signature", mo.getSignMd5());
+
+            tx.success();
+        }
+        return node;
+    }
+
+    public void createRelationship(Node node1, Node node2, GitRelationships rel) {
+        try (Transaction tx = db.beginTx()) {
+
+            Relationship relationship = node1.createRelationshipTo(node2, rel);
+
+            tx.success();
         }
     }
 
+    public Node matchFileMD5(FileObject fo){
+        Node node;
+        try (Transaction tx = db.beginTx()) {
+            node = db.findNode(GitLables.File, "content_md5", fo.getMd5());
+            tx.success();
+        }
+        return node;
+    }
+
+    public Node matchClassMD5(ClassObject co){
+        Node node = null;
+        try (Transaction tx = db.beginTx()) {
+            ResourceIterator<Node> result = db.findNodes(GitLables.Class, "content_md5", co.getBodyMd5());
+            while (result.hasNext()) {
+                node = result.next();
+                if (node.getProperty("path_signature").equals(co.getSignMd5())) {
+                    break;
+                }
+            }
+            tx.success();
+        }
+        return node;
+    }
+
+    public Node matchMethodMD5(MethodObject mo){
+        Node node = null;
+        try (Transaction tx = db.beginTx()) {
+            ResourceIterator<Node> result = db.findNodes(GitLables.Method, "content_md5", mo.getBodyMd5());
+            while (result.hasNext()) {
+                node = result.next();
+                if (node.getProperty("path_signature").equals(mo.getSignMd5())) {
+                    break;
+                }
+            }
+            tx.success();
+        }
+        return node;
+    }
+
 }
+
+enum GitLables implements Label {
+    Branch, Commit, File, Class, Method
+}
+

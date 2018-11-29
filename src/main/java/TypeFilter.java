@@ -7,7 +7,7 @@ public class TypeFilter{
     private static String[] VIDEOS = {"avi", "mpg", "mov", "mp4", "swf"};
     private static String[] AUDIOS = {"mp3", "wav", "aif", "au", "ram", "wma", "mmf", "amr", "aac", "flac"};
     private static String[] CUSTOM = {"xml", "yml", "js", "cpp", "c", "mk", "py", "html", "h", "gradle", "jar",
-            "md", "gitignore", "properties"};
+            "md", "gitignore", "properties", "apk"};
 
     private boolean filter_pic = false;
     private boolean filter_audio = false;
@@ -33,6 +33,9 @@ public class TypeFilter{
         this.filter_custom = a;
     }
     public boolean isFilter(String type){
+        if (type == null)
+            return true;
+
         if(filter_pic){
             for(String filter_type: PICS){
                 if (type.equals(filter_type))
