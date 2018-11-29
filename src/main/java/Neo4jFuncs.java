@@ -78,7 +78,7 @@ public class Neo4jFuncs {
         return node;
     }
 
-    public Node createClassNode(ClassObject co) {
+    public Node createClassNode(ClassObject co, String commit_name) {
         Node node;
         try (Transaction tx = db.beginTx()) {
 
@@ -88,13 +88,14 @@ public class Neo4jFuncs {
             node.setProperty("file", co.getFile());
             node.setProperty("content_md5", co.getBodyMd5());
             node.setProperty("path_signature", co.getSignMd5());
+            node.setProperty("create_commit", commit_name);
 
             tx.success();
         }
         return node;
     }
 
-    public Node createMethodNode(MethodObject mo) {
+    public Node createMethodNode(MethodObject mo, String commit_name) {
         Node node;
         try (Transaction tx = db.beginTx()) {
 
@@ -106,6 +107,7 @@ public class Neo4jFuncs {
             node.setProperty("class", mo.getClazz());
             node.setProperty("file", mo.getFile());
             node.setProperty("path_signature", mo.getSignMd5());
+            node.setProperty("create_commit", commit_name);
 
             tx.success();
         }
