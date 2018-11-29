@@ -67,13 +67,13 @@ public class Analyser {
                             ClassObject co = parser.resolveClass(clazz, apiDatabase);
                             class_node = neo4j.matchClassMD5(co);
                             if(class_node == null){
-                                class_node = neo4j.createClassNode(co);
+                                class_node = neo4j.createClassNode(co, commit.getName());
                             }
                             neo4j.createRelationship(file_node, class_node, GitRelationships.FiletoClass);
                             for(MethodObject mo : co.getMethods()){
                                 method_node = neo4j.matchMethodMD5(mo);
                                 if(method_node == null){
-                                    method_node = neo4j.createMethodNode(mo);
+                                    method_node = neo4j.createMethodNode(mo, commit.getName());
                                 }
                                 neo4j.createRelationship(class_node, method_node, GitRelationships.ClasstoMethod);
                                 for(ApiObject ao : mo.getApis()){
