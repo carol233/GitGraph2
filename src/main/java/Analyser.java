@@ -42,7 +42,7 @@ public class Analyser {
                 continue;
             }
             branch_node = neo4j.createBranchNode(branch.getName());
-
+            System.out.println("* Branch: " + branch.getName());
             List<RevCommit> commits = gitOperator.getBranchCommits(branch);
             for(RevCommit commit : commits){
                 now_commit = neo4j.createCommitNode(commit.getName(), commit.getAuthorIdent().toString(),

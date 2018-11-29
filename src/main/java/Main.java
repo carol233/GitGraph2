@@ -28,6 +28,8 @@ public class Main {
 
         String project = ns.getString("project");
         String filter = ns.getString("filter");
+        System.out.println("Starting...");
         new Analyser(project, filter).run();
+        System.out.println("Done.");
     }
 }
