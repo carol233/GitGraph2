@@ -1,3 +1,4 @@
+import helper.Configuration;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
@@ -17,7 +18,8 @@ public class Main {
                 .help("git project root directory");
         parser.addArgument("-f", "--filter")
                 .help("type filter switch for source file");
-
+        parser.addArgument("-d", "--database")
+                .help("specify database path");
         Namespace ns = null;
         try {
             ns = parser.parseArgs(args);
@@ -27,7 +29,19 @@ public class Main {
         }
 
         String project = ns.getString("project");
+        if (project != null){
+            Configuration.project = project;
+        }
+
         String filter = ns.getString("filter");
+        if (filter == null){
+            filter = "";
+        }
+
+        String database = ns.getString("database");
+        if (database != null){
+            Configuration.database = database;
+        }
         System.out.println("Starting...");
         new Analyser(project, filter).run();
         System.out.println("Done.");

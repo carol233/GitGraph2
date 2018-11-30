@@ -2,6 +2,7 @@ package neo4j; /**
  * Created by Carol on 2018/11/28.
  */
 
+import helper.Configuration;
 import helper.Utils;
 import model.ApiObject;
 import model.ClassObject;
@@ -19,10 +20,16 @@ public class Neo4jFuncs {
 
     public Neo4jFuncs() {
         GraphDatabaseFactory dbFactory = new GraphDatabaseFactory();
-        File database = new File("./graph.db");
+        File database;
+        if (Configuration.database != null){
+            database = new File(Configuration.database);
+        }else{
+            File project = new File(Configuration.project);
+            database = new File(project.getParent(), "./graph.db");
+        }
         if (database.exists())
             Utils.deleteDir(database);
-        this.db = dbFactory.newEmbeddedDatabase(new File("./graph.db"));
+        this.db = dbFactory.newEmbeddedDatabase(database);
     }
 
     private static void registerShutdownHook(final GraphDatabaseService graphDb) {
