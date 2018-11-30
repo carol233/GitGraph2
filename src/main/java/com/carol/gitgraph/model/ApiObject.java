@@ -1,4 +1,4 @@
-package model;
+package com.carol.gitgraph.model;
 
 public class ApiObject {
     public String package_name;

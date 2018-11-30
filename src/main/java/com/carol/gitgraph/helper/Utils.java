@@ -1,4 +1,4 @@
-package helper;
+package com.carol.gitgraph.helper;
 
 import org.apache.commons.codec.digest.DigestUtils;
 

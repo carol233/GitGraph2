@@ -1,7 +1,7 @@
-package api;
+package com.carol.gitgraph.api;
 
-import helper.Utils;
-import model.ApiObject;
+import com.carol.gitgraph.helper.Utils;
+import com.carol.gitgraph.model.ApiObject;
 
 import java.util.HashMap;
 import java.util.List;

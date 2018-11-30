@@ -1,8 +1,8 @@
-package git;
+package com.carol.gitgraph.git;
 
 import com.google.common.collect.Lists;
-import helper.TypeFilter;
-import model.FileObject;
+import com.carol.gitgraph.helper.TypeFilter;
+import com.carol.gitgraph.model.FileObject;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.*;
@@ -38,7 +38,7 @@ public class GitOperator {
         if(filter.contains("c"))
             this.typeFilter.setCustomFilter(true);
         try {
-            repository = FileRepositoryBuilder.create(new File(gitProject, ".git"));
+            repository = FileRepositoryBuilder.create(new File(gitProject, ".com.carol.gitgraph.git"));
         } catch (IOException e) {
             e.printStackTrace();
             return;

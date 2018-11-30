@@ -1,16 +1,16 @@
-/**
+package com.carol.gitgraph; /**
  * Created by Carol on 2018/11/27.
  */
-import api.APIDatabase;
+import com.carol.gitgraph.api.APIDatabase;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.*;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import helper.Utils;
-import model.ApiObject;
-import model.ClassObject;
-import model.MethodObject;
+import com.carol.gitgraph.helper.Utils;
+import com.carol.gitgraph.model.ApiObject;
+import com.carol.gitgraph.model.ClassObject;
+import com.carol.gitgraph.model.MethodObject;
 
 
 import java.util.ArrayList;

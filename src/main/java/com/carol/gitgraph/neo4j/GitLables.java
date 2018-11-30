@@ -1,4 +1,4 @@
-package neo4j;
+package com.carol.gitgraph.neo4j;
 
 import org.neo4j.graphdb.Label;
 

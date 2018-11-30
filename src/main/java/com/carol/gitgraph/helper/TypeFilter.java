@@ -1,4 +1,4 @@
-package helper;
+package com.carol.gitgraph.helper;
 
 /**
  * Created by Carol on 2018/11/27.
