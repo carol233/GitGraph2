@@ -3,10 +3,7 @@
  */
 import api.APIDatabase;
 import com.github.javaparser.JavaParser;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.ImportDeclaration;
-import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.*;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -18,6 +15,7 @@ import model.MethodObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Parser {
     private String filepath;
@@ -25,10 +23,18 @@ public class Parser {
 
     public Parser(String filepath, String filedata){
         this.filepath = filepath;
-        this.compilationUnit = JavaParser.parse(filedata);
+        try {
+            this.compilationUnit = JavaParser.parse(filedata);
+        }catch (Exception e){
+            e.printStackTrace();
+            this.compilationUnit = null;
+        }
     }
 
     public List<ClassOrInterfaceDeclaration> getClasses(){
+        if (this.compilationUnit == null)
+            return null;
+
         List<ClassOrInterfaceDeclaration> classes = new ArrayList<>();
         for (Node node : compilationUnit.getChildNodes()){
             if (node instanceof ClassOrInterfaceDeclaration){
@@ -49,6 +55,14 @@ public class Parser {
         }
 
         ClassObject co = new ClassObject();
+        Optional<Node> parentNode = compilationUnit.getParentNode();
+        if (parentNode.isPresent()){
+            Optional<PackageDeclaration> packageDeclaration = ((CompilationUnit)parentNode.get()).getPackageDeclaration();
+            if (packageDeclaration.isPresent()){
+                co.setPackageName(packageDeclaration.get().getName().toString());
+            }
+        }
+
         for (int i = 0; i < member.size(); i++) {
             if (member.get(i) instanceof MethodDeclaration) {
                 MethodDeclaration m = (MethodDeclaration) member.get(i);

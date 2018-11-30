@@ -58,7 +58,17 @@ public class Neo4jFuncs {
             node.setProperty("developer", developer);
             node.setProperty("time", time);
             node.setProperty("message", commit_message);
-
+            String[] blacklist = {"fix", "bug"};
+            boolean isFix = false;
+            for (String bad_word : blacklist){
+                if (commit_message.toLowerCase().contains(bad_word)){
+                    node.setProperty("type", "fixbug");
+                    isFix = true;
+                }
+            }
+            if (!isFix){
+                node.setProperty("type", "normal");
+            }
             tx.success();
         }
         return node;

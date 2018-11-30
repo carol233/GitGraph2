@@ -11,6 +11,7 @@ import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.neo4j.graphdb.Node;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -35,7 +36,6 @@ public class Analyser {
         apiDatabase.load_api("assets/system-current.txt");
 
         Node branch_node, last_commit = null, api_node, now_commit, file_node, class_node, method_node;
-        Boolean file_flag, class_flag, method_flag;
         branches = gitOperator.getBranches();
         for(Ref branch : branches){
             if(branch.getName().equals("HEAD")){
@@ -44,6 +44,7 @@ public class Analyser {
             branch_node = neo4j.createBranchNode(branch.getName());
             System.out.println("* Branch: " + branch.getName());
             List<RevCommit> commits = gitOperator.getBranchCommits(branch);
+            Collections.reverse(commits);
             for(RevCommit commit : commits){
                 now_commit = neo4j.createCommitNode(commit.getName(), commit.getAuthorIdent().toString(),
                         commit.getCommitTime(), commit.getFullMessage());
@@ -55,45 +56,48 @@ public class Analyser {
                 List<FileObject> files = gitOperator.getCommitFiles(commit);
 
                 for(FileObject fileObject : files) {
-                    file_flag = false;
                     file_node = neo4j.matchFileMD5(fileObject);
-                    if(file_node == null){ //new
-                        file_flag = true;
-                        file_node = neo4j.createFileNode(fileObject, commit.getName());
+                    if (file_node != null) {
+                        neo4j.createRelationship(now_commit, file_node, GitRelationships.CommittoFile);
+                        continue;
                     }
-                    neo4j.createRelationship(now_commit, file_node, GitRelationships.CommittoFile);
-                    if (file_flag && fileObject.getType().equals("java")) {
-                        Parser parser = new Parser(fileObject.getPath(), fileObject.getFiledata());
-                        //System.out.println(fileObject.getPath());
 
-                        for (ClassOrInterfaceDeclaration clazz : parser.getClasses()){
-                            class_flag = false;
-                            ClassObject co = parser.resolveClass(clazz, apiDatabase);
-                            class_node = neo4j.matchClassMD5(co);
-                            if(class_node == null){
-                                class_flag = true;
-                                class_node = neo4j.createClassNode(co, commit.getName());
-                            }
+                    file_node = neo4j.createFileNode(fileObject, commit.getName());
+                    neo4j.createRelationship(now_commit, file_node, GitRelationships.CommittoFile);
+
+                    if (!fileObject.getType().equals("java"))
+                        continue;
+
+                    Parser parser = new Parser(fileObject.getPath(), fileObject.getFiledata());
+                    System.out.println(fileObject.getPath());
+
+                    for (ClassOrInterfaceDeclaration clazz : parser.getClasses()){
+                        ClassObject co = parser.resolveClass(clazz, apiDatabase);
+                        class_node = neo4j.matchClassMD5(co);
+                        if (class_node != null) {
                             neo4j.createRelationship(file_node, class_node, GitRelationships.FiletoClass);
-                            if(class_flag){
-                                for(MethodObject mo : co.getMethods()){
-                                    method_flag = false;
-                                    method_node = neo4j.matchMethodMD5(mo);
-                                    if(method_node == null){
-                                        method_flag = true;
-                                        method_node = neo4j.createMethodNode(mo, commit.getName());
-                                    }
-                                    neo4j.createRelationship(class_node, method_node, GitRelationships.ClasstoMethod);
-                                    if(method_flag){
-                                        for(ApiObject ao : mo.getApis()){
-                                            api_node = neo4j.matchAPI(ao);
-                                            if(api_node == null){
-                                                api_node = neo4j.createAPINode(ao);
-                                            }
-                                            neo4j.createRelationship(method_node, api_node, GitRelationships.MethodtoAPI);
-                                        }
-                                    }
+                            continue;
+                        }
+
+                        class_node = neo4j.createClassNode(co, commit.getName());
+                        neo4j.createRelationship(file_node, class_node, GitRelationships.FiletoClass);
+
+                        for(MethodObject mo : co.getMethods()){
+                            method_node = neo4j.matchMethodMD5(mo);
+                            if (method_node != null){
+                                neo4j.createRelationship(class_node, method_node, GitRelationships.ClasstoMethod);
+                                continue;
+                            }
+
+                            method_node = neo4j.createMethodNode(mo, commit.getName());
+                            neo4j.createRelationship(class_node, method_node, GitRelationships.ClasstoMethod);
+
+                            for(ApiObject ao : mo.getApis()){
+                                api_node = neo4j.matchAPI(ao);
+                                if(api_node == null){
+                                    api_node = neo4j.createAPINode(ao);
                                 }
+                                neo4j.createRelationship(method_node, api_node, GitRelationships.MethodtoAPI);
                             }
                         }
                     }

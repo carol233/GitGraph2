@@ -5,6 +5,7 @@ import helper.Utils;
 import java.util.List;
 
 public class ClassObject {
+    private String package_name = null;
     private String name;
     private String file;
     private String sign_md5;
@@ -53,5 +54,13 @@ public class ClassObject {
 
     public void setMethods(List<MethodObject> methods){
         this.methods = methods;
+    }
+
+    public String getPackageName() {
+        return package_name;
+    }
+
+    public void setPackageName(String package_name) {
+        this.package_name = package_name;
     }
 }
