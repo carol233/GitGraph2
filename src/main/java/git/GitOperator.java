@@ -1,10 +1,11 @@
-package com.carol.gitgraph.git;
+package git;
 
 import com.google.common.collect.Lists;
-import com.carol.gitgraph.helper.TypeFilter;
-import com.carol.gitgraph.model.FileObject;
+import helper.TypeFilter;
+import model.FileObject;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.lib.*;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
@@ -38,7 +39,7 @@ public class GitOperator {
         if(filter.contains("c"))
             this.typeFilter.setCustomFilter(true);
         try {
-            repository = FileRepositoryBuilder.create(new File(gitProject, ".com.carol.gitgraph.git"));
+            repository = FileRepositoryBuilder.create(new File(gitProject, ".git"));
         } catch (IOException e) {
             e.printStackTrace();
             return;
@@ -77,15 +78,19 @@ public class GitOperator {
             treeWalk.setRecursive(true);
             ArrayList<FileObject> result = new ArrayList<FileObject>();
             while(treeWalk.next()) {
-                String filename = treeWalk.getNameString();
-                String path = treeWalk.getPathString();
-                ObjectId objectid = treeWalk.getObjectId(0);
-                FileObject fileObject = new FileObject(path, filename, objectid);
-                ObjectLoader loader = repository.open(objectid);
-                fileObject.setLoader(loader);
-                fileObject.setFiledata(new String(loader.getBytes(), "UTF-8"));
-                if(!typeFilter.isFilter(fileObject.getType()))
-                    result.add(fileObject);
+                try {
+                    String filename = treeWalk.getNameString();
+                    String path = treeWalk.getPathString();
+                    ObjectId objectid = treeWalk.getObjectId(0);
+                    FileObject fileObject = new FileObject(path, filename, objectid);
+                    ObjectLoader loader = repository.open(objectid);
+                    fileObject.setLoader(loader);
+                    fileObject.setFiledata(new String(loader.getBytes(), "UTF-8"));
+                    if (!typeFilter.isFilter(fileObject.getType()))
+                        result.add(fileObject);
+                }catch (MissingObjectException e){
+                    System.out.println(e);
+                }
             }
             return result;
         }catch (IOException e) {

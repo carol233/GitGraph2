@@ -1,14 +1,12 @@
-package com.carol.gitgraph;
-
-import com.carol.gitgraph.api.APIDatabase;
+import api.APIDatabase;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.carol.gitgraph.git.GitOperator;
-import com.carol.gitgraph.model.ApiObject;
-import com.carol.gitgraph.model.ClassObject;
-import com.carol.gitgraph.model.FileObject;
-import com.carol.gitgraph.model.MethodObject;
-import com.carol.gitgraph.neo4j.GitRelationships;
-import com.carol.gitgraph.neo4j.Neo4jFuncs;
+import git.GitOperator;
+import model.ApiObject;
+import model.ClassObject;
+import model.FileObject;
+import model.MethodObject;
+import neo4j.GitRelationships;
+import neo4j.Neo4jFuncs;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.neo4j.graphdb.Node;
@@ -48,6 +46,7 @@ public class Analyser {
             List<RevCommit> commits = gitOperator.getBranchCommits(branch);
             Collections.reverse(commits);
             for(RevCommit commit : commits){
+                System.out.println(commit.getName());
                 now_commit = neo4j.createCommitNode(commit.getName(), commit.getAuthorIdent().toString(),
                         commit.getCommitTime(), commit.getFullMessage());
                 neo4j.createRelationship(branch_node, now_commit, GitRelationships.BranchtoCommit);
@@ -72,6 +71,7 @@ public class Analyser {
 
                     Parser parser = new Parser(fileObject.getPath(), fileObject.getFiledata());
                     System.out.println(fileObject.getPath());
+
                     if (parser.getClasses() == null) continue;
 
                     for (ClassOrInterfaceDeclaration clazz : parser.getClasses()){

@@ -1,7 +1,7 @@
-package com.carol.gitgraph.model;
+package model;
 
 
-import com.carol.gitgraph.helper.Utils;
+import helper.Utils;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectLoader;
 

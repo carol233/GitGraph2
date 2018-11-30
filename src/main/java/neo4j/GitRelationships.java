@@ -1,4 +1,4 @@
-package com.carol.gitgraph.neo4j;
+package neo4j;
 
 import org.neo4j.graphdb.RelationshipType;
 

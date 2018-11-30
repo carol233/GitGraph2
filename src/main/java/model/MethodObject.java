@@ -1,6 +1,6 @@
-package com.carol.gitgraph.model;
+package model;
 
-import com.carol.gitgraph.helper.Utils;
+import helper.Utils;
 import java.util.List;
 
 public class MethodObject {

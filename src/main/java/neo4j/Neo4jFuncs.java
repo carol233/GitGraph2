@@ -1,12 +1,12 @@
-package com.carol.gitgraph.neo4j; /**
+package neo4j; /**
  * Created by Carol on 2018/11/28.
  */
 
-import com.carol.gitgraph.helper.Utils;
-import com.carol.gitgraph.model.ApiObject;
-import com.carol.gitgraph.model.ClassObject;
-import com.carol.gitgraph.model.FileObject;
-import com.carol.gitgraph.model.MethodObject;
+import helper.Utils;
+import model.ApiObject;
+import model.ClassObject;
+import model.FileObject;
+import model.MethodObject;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 

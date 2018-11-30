@@ -1,4 +1,4 @@
-package com.carol.gitgraph.api;
+package api;
 
 import java.util.ArrayList;
 import java.util.List;
