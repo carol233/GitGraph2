@@ -24,8 +24,7 @@ public class Neo4jFuncs {
         if (Configuration.database != null){
             database = new File(Configuration.database);
         }else{
-            File project = new File(Configuration.project);
-            database = new File(project.getParent(), "./graph.db");
+            database = new File(Configuration.project + ".db");
         }
         if (database.exists())
             Utils.deleteDir(database);
