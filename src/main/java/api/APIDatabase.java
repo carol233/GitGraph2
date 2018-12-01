@@ -1,8 +1,10 @@
 package api;
 
-import helper.Utils;
 import model.ApiObject;
+import org.apache.commons.io.IOUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,8 +18,14 @@ public class APIDatabase {
 
     }
 
-    public void load_api(String filepath){
-        String content = Utils.readToString(filepath);
+    public void load_api(InputStream is){
+        String content;
+        try {
+            content = IOUtils.toString(is, "UTF-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ;
+        }
         String[] lines = content.split("\n");
         String package_name = null;
         String class_name;

@@ -11,6 +11,7 @@ import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.neo4j.graphdb.Node;
 
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,8 +33,10 @@ public class Analyser {
 
     public void run(){
         APIDatabase apiDatabase = new APIDatabase();
-        apiDatabase.load_api("assets/current.txt");
-        apiDatabase.load_api("assets/system-current.txt");
+        InputStream api_file1 = this.getClass().getResourceAsStream("current.txt");
+        apiDatabase.load_api(api_file1);
+        InputStream api_file2 = this.getClass().getResourceAsStream("system-current.txt");
+        apiDatabase.load_api(api_file2);
 
         Node branch_node, last_commit = null, api_node, now_commit, file_node, class_node, method_node;
         branches = gitOperator.getBranches();
