@@ -37,3 +37,18 @@ c  - -customize
   You just need to double-click on the node to see other nodes and relationships associated with it.
 
 
+修改最多的十个类
+
+MATCH (c:Class)  RETURN c.name, count(*) AS cnt ORDER BY cnt DESC LIMIT 10
+
+MATCH (c:Method) RETURN c.name, count(*) AS cnt ORDER BY cnt DESC LIMIT 10
+
+MATCH (c:File) RETURN c.path, count(*) AS cnt ORDER BY cnt DESC LIMIT 10
+
+修改最多的方法引用的api
+
+MATCH p = (m:Method)-->(a:API) RETURN a.name, count(p) AS cnt ORDER BY cnt DESC LIMIT 10
+
+Fixbug的commit对应的API
+
+MATCH (c:Commit)-->(f:File)-->(z:Class)-->(m:Method)-->(a:API) WHERE c.type = "fixbug" AND m.create_commit = c.name RETURN a.name, count((m:Method)-->(a:API) ) AS cnt ORDER BY cnt DESC LIMIT 10
